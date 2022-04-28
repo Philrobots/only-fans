@@ -1,0 +1,42 @@
+services:
+  backend:
+    container_name: onlytanks-backend
+    restart: unless-stopped
+    build: ./backend
+    environment:
+      ENVIRONMENT: docker
+      AWS_BUCKET_NAME: only-tanks-user-images
+      AWS_BUCKET_REGION: us-east-1
+      AWS_ACCES_KEY_ID: AKIA3BTJSTENVACS4KMF
+      AWS_SECRET_ACCESS_KEY: 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
+
+    volumes:
+      - ./backend/src:/app/src
+    ports:
+      - 8080:8080
+    depends_on:
+      - mongo
+
+  frontend:
+    container_name: onlytanks-frontend
+    restart: unless-stopped
+    build: ./frontend
+    environment:
+      NEXT_PUBLIC_ENVIRONMENT: docker
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - /app/node_modules
+
+  mongo:
+    image: mongo:latest
+    container_name: onlytanks-mongo
+    environment:
+      MONGO_INITDB_DATABASE: onlytanks
+      MONGODB_DATA_DIR: /data/db
+    volumes:
+      - ./data/mongo/db:/data/db
+    ports:
+      - "27017:27017"
